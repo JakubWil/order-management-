@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from app.database import supabase
 
 # Tworzysz instancję aplikacji FastAPI
 # Powstaje obiekt app, którego używa serwer (np. uvicorn main:app) do uruchomienia API.
@@ -11,3 +12,9 @@ app = FastAPI(
 @app.get("/")
 def root():
     return {"message": "Order Management API działa!"}
+
+
+@app.get("/test-db")
+def test_db():
+    response = supabase.table("products").select("*").execute()
+    return {'products': response.data}
