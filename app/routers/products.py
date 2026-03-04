@@ -1,7 +1,8 @@
 #standardowy sposób zwracania błędów w FastAPI
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.database import supabase
 from app.models import ProductCreate, ProductUpdate
+from app.auth import get_current_user
 
 # APIRouter to mini-aplikacja która potem podłączamy do głównej
 # prefix znaczy że wszystkie endpointy zaczynają się od /products
@@ -31,34 +32,31 @@ def get_product(product_id: str):
 
 # POST /products – stwórz nowy produkt
 @router.post("/")
-def create_product(product: ProductCreate):
+def create_product(product: ProductCreate, current_user: dict = Depends(get_current_user)):
+    # Depends(get_current_user) znaczy – przed wywołaniem tej funkcji
+    # sprawdź token i daj mi dane zalogowanego użytkownika
     # .dict() zamienia model Pydantic na słownik który Supabase rozumie
     response = supabase.table("products").insert(product.dict()).execute()
     return response.data[0]
 
 # PATCH /products/{id} – zaktualizuj produkt
 @router.patch("/{product_id}")
-def update_product(product_id: str, product: ProductUpdate):
+def update_product(product_id: str, product: ProductUpdate, current_user: dict = Depends(get_current_user)):
     # exclude_none=True znaczy "nie wysyłaj pól które są None"
     # dzięki temu możemy aktualizować tylko wybrane pola
     data = product.dict(exclude_none=True)
     
     if not data:
         raise HTTPException(status_code=400, detail="Brak danych do aktualizacji")
-    
     response = supabase.table("products").update(data).eq("id", product_id).execute()
-    
     if not response.data:
         raise HTTPException(status_code=404, detail="Produkt nie istnieje")
-    
     return response.data[0]
 
 # DELETE /products/{id} – usuń produkt
 @router.delete("/{product_id}")
-def delete_product(product_id: str):
+def delete_product(product_id: str, current_user: dict = Depends(get_current_user)):
     response = supabase.table("products").delete().eq("id", product_id).execute()
-    
     if not response.data:
         raise HTTPException(status_code=404, detail="Produkt nie istnieje")
-    
     return {"message": "Produkt usunięty"}

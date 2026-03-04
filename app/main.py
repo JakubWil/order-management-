@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers import products
+from app.routers import products , auth
 
 # Tworzysz instancję aplikacji FastAPI
 # Powstaje obiekt app, którego używa serwer (np. uvicorn main:app) do uruchomienia API.
@@ -11,6 +11,9 @@ app = FastAPI(
 
 # Podłączamy router – teraz wszystkie endpointy z products.py są aktywne
 app.include_router(products.router)
+# Podłączamy router autoryzacji
+app.include_router(auth.router)
+
 
 @app.get("/")
 def root():
