@@ -46,3 +46,14 @@ class UserLogin(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str  # zawsze "bearer" – to standard HTTP
+
+
+
+# Pojedyncza pozycja zamówienia (jeden produkt + ilość)
+class OrderItemCreate(BaseModel):
+    product_id: str
+    quantity: int
+
+# Całe zamówienie to lista pozycji
+class OrderCreate(BaseModel):
+    items: list[OrderItemCreate]
