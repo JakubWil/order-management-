@@ -79,7 +79,7 @@ order-management-api/
 
 ### Prerequisites
 
-- Python 3.10+
+- Python 3.10+ or higher
 - [Poetry](https://python-poetry.org/docs/#installation)
 - A [Supabase](https://supabase.com) account with a project created
 
